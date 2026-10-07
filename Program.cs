@@ -1,46 +1,93 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Starship_Mini.Models;
 
-using Starship_Mini.Models;
+namespace Starship_Mini;
 
-// Starship starship1 = new Starship("Bounty", 8, new DateOnly(2026, 1, 1));
-// BaseShip starship1 = new Starship("Bounty", 8, new DateOnly(2026, 1, 1));
-
-// Object Initializer Syntax
-Starship starship2 = new Starship() // 1000
+public class Program
 {
-    Name = "Bounty",
-    CrewMembers = 8,
-    BuildAt = new DateOnly(2026, 1, 1),
-    IsBattleShip =  true,
-};
+    // Main = Startpunkt des Programms
+    public static void Main(string[] args)
+    {
+        // --- 1) Konstruktor ---
+        // Variable vom Typ der Basis-Klasse, Objekt vom Typ der Kind-Klasse
+        BaseShip starship1 = new Starship("  Bounty  ", 8, new DateOnly(2026, 1, 1));
 
-// Object Initializer Syntax
-Starship starship3 = new Starship() // 2000
-{
-    Name = "Bounty",
-    CrewMembers = 8,
-    BuildAt = new DateOnly(2026, 1, 1),
-    IsBattleShip =  true,
-};
+        // --- 2) Object Initializer Syntax ---
+        Starship starship2 = new Starship()
+        {
+            Name = "Enterprise",
+            CrewMembers = 10,
+            BuildAt = new DateOnly(2020, 5, 17),
+            IsBattleShip = true,
+        };
 
-Starship starship4 = starship3;
+        Starship starship3 = new Starship("Voyager", 3, new DateOnly(2024, 3, 9));
 
-// referential equality
-Console.WriteLine(starship2 == starship3); // referential equality
-Console.WriteLine(starship2.Equals(starship3)); // structural equality
-// Console.WriteLine(starship3 == starship4); // true
-
-
-// var mothership = new Mothership();
-// mothership.DockOn(starship1);
-// mothership.DockOn(starship2);
-// mothership.Baseships.Clear(); // coz of IReadOnlyList
-
-// foreach (var ship in mothership.Baseships)
-// {
-    // Console.WriteLine(ship);
-// }
+        // Polymorphie: Describe() => kommt aus Starship, obwohl der Typ BaseShip ist
+        Console.WriteLine(starship1);
+        Console.WriteLine(starship2);
+        Console.WriteLine(starship3);
+        Console.WriteLine();
 
 
-// Console.WriteLine(starship1);
-// Console.WriteLine(starship2);
+        // --- 3) Equals ---
+        Starship copy = new Starship("Bounty", 5, new DateOnly(2025, 1, 1));
+
+        Console.WriteLine($"== (gleiche Referenz?):  {starship1 == copy}");      // False
+        Console.WriteLine($"Equals (gleicher Name?): {starship1.Equals(copy)}"); // True
+        Console.WriteLine();
+
+
+        // --- 4) Mothership ---
+        Mothership mothership = new Mothership();
+        mothership.DockOn(starship1);
+        mothership.DockOn(starship2);
+        mothership.DockOn(starship3);
+
+        Console.WriteLine($"Docked ships:      {mothership.Baseships.Count}");
+        Console.WriteLine($"Sum crew members:  {mothership.SumCrewMembers()}");
+        Console.WriteLine($"Ships with crew > 5: {mothership.NumberLargeCrew(5)}");
+
+        foreach (BaseShip ship in mothership.NumberLargeShips(5))
+        {
+            Console.WriteLine($"  - {ship.Name}");
+        }
+        Console.WriteLine();
+
+
+        try
+        {
+            mothership.DockOn(copy);
+        }
+        catch (ArgumentException e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+        }
+
+        try
+        {
+            starship2.CrewMembers = 11;                     // > 10
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+        }
+
+        try
+        {
+            starship2.Name = "   ";
+        }
+        catch (ArgumentException e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+        }
+
+        try
+        {
+            starship2.BuildAt = new DateOnly(2010, 1, 1);   // älter als 10 Jahre
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            Console.WriteLine($"Error: {e.Message}");
+        }
+    }
+}
